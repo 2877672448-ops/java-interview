@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Java八股高频面试题</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--pri:#1a365d;--acc:#2b6cb0;--txt:#2d3748;--mut:#718096;--bg:#f7fafc;--card:#fff;--grn:#2f855a;--org:#c05621;--rd:#c53030;--ylw:#b7791f}
+html{font-size:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--txt);line-height:1.6;overflow-x:hidden}
+.app{max-width:500px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+.header{background:linear-gradient(135deg,var(--pri),var(--acc));color:#fff;padding:16px 20px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+.header h1{font-size:18px;font-weight:700;margin-bottom:4px}
+.header .sub{font-size:12px;opacity:.85}
+.search-bar{margin-top:10px;position:relative}
+.search-bar input{width:100%;padding:8px 36px 8px 14px;border:none;border-radius:20px;font-size:14px;background:rgba(255,255,255,.2);color:#fff;outline:none}
+.search-bar input::placeholder{color:rgba(255,255,255,.6)}
+.search-bar input:focus{background:rgba(255,255,255,.95);color:#333}
+.search-bar input:focus::placeholder{color:#999}
+.search-bar .ico{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:16px;opacity:.6;pointer-events:none}
+.tabs{display:flex;gap:4px;padding:8px 12px 0;overflow-x:auto;background:#fff;border-bottom:1px solid #e2e8f0;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600;color:var(--mut);background:var(--bg);border:1px solid #e2e8f0;cursor:pointer;transition:all .2s}
+.tab.active{background:var(--acc);color:#fff;border-color:var(--acc)}
+.content{flex:1;padding:12px 16px 80px}
+.q-card{background:var(--card);border-radius:12px;margin-bottom:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);border:1px solid #e2e8f0;transition:all .3s}
+.q-card .q-head{padding:14px 16px;cursor:pointer;display:flex;align-items:flex-start;gap:8px}
+.q-card .q-num{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--acc);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.q-card .q-text{font-size:15px;font-weight:600;color:var(--pri);flex:1;line-height:1.5}
+.q-card .q-arrow{flex-shrink:0;color:var(--mut);font-size:14px;transition:transform .3s;margin-top:3px}
+.q-card.open .q-arrow{transform:rotate(180deg)}
+.q-card .answer{display:none;padding:0 16px 14px;animation:fadeIn .3s ease}
+.q-card.open .answer{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.q-card .answer p{font-size:13px;color:var(--txt);margin-bottom:8px;line-height:1.7}
+.q-card .answer .code{background:#1e293b;color:#e2e8f0;padding:10px 12px;border-radius:8px;font-family:Consolas,Monaco,monospace;font-size:11px;line-height:1.5;overflow-x:auto;margin:8px 0;white-space:pre}
+.q-card .answer .tip{font-size:12px;color:var(--grn);background:#f0fff4;padding:6px 10px;border-radius:6px;margin:6px 0;border-left:3px solid var(--grn)}
+.q-card .answer .warn{font-size:12px;color:var(--rd);background:#fff5f5;padding:6px 10px;border-radius:6px;margin:6px 0;border-left:3px solid var(--rd)}
+.day-title{font-size:14px;font-weight:700;color:var(--pri);margin:16px 0 8px;padding:6px 0;border-bottom:2px solid var(--acc);display:flex;align-items:center;gap:6px}
+.day-title .count{font-size:11px;color:var(--mut);font-weight:400}
+.fab{position:fixed;bottom:16px;right:16px;width:48px;height:48px;border-radius:50%;background:var(--acc);color:#fff;border:none;box-shadow:0 4px 12px rgba(43,108,176,.4);font-size:20px;cursor:pointer;z-index:90;display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.fab:active{transform:scale(.9)}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e2e8f0;display:flex;padding:8px 0;max-width:500px;margin:0 auto;z-index:90}
+.nav-btn{flex:1;text-align:center;padding:6px 0;font-size:11px;color:var(--mut);cursor:pointer}
+.nav-btn.active{color:var(--acc)}
+.nav-btn .nav-ico{font-size:18px;display:block;margin-bottom:2px}
+.flash-mode{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.flash-mode.show{display:flex}
+.flash-card{background:#fff;border-radius:20px;max-width:400px;width:100%;min-height:300px;max-height:70vh;padding:30px 24px 80px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow-y:auto}
+.flash-card .fc-tag{font-size:12px;color:var(--mut);margin-bottom:8px}
+.flash-card .fc-q{font-size:18px;font-weight:700;color:var(--pri);margin-bottom:20px;line-height:1.5}
+.flash-card .fc-a{font-size:13px;color:var(--txt);line-height:1.7;text-align:left;width:100%}
+.flash-card .fc-a .code{background:#1e293b;color:#e2e8f0;padding:8px;border-radius:6px;font-family:monospace;font-size:11px;margin:6px 0;white-space:pre;overflow-x:auto}
+.flash-card .fc-a .tip{font-size:12px;color:var(--grn);background:#f0fff4;padding:6px;border-radius:4px;margin:6px 0;border-left:3px solid var(--grn)}
+.flash-card .hint{font-size:12px;color:var(--mut);margin-top:16px}
+.flash-btn{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:12px;padding:16px 20px;background:rgba(0,0,0,.85);z-index:210}
+.flash-btn button{padding:12px 20px;border-radius:24px;border:none;font-size:14px;font-weight:600;cursor:pointer}
+.flash-btn .flip{background:var(--acc);color:#fff}
+.flash-btn .next{background:var(--pri);color:#fff}
+.flash-btn .prev{background:#4a5568;color:#fff}
+.flash-btn .close{background:#e53e3e;color:#fff;border:none;font-size:16px;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.empty{text-align:center;padding:40px;color:var(--mut);font-size:14px}
+.tag{display:inline-block;font-size:10px;padding:2px 6px;border-radius:4px;margin-right:4px;font-weight:600}
+.tag-java{background:#fef5e7;color:#b7791f}
+.tag-mysql{background:#e6fffa;color:#2f855a}
+.tag-redis{background:#fff5f5;color:#c53030}
+.tag-spring{background:#ebf4ff;color:#2b6cb0}
+.tag-jvm{background:#f3e8ff;color:#6b46c1}
+.tag-design{background:#fffaeb;color:#b7791f}
+.progress-bar{height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin-top:6px;overflow:hidden}
+.progress-bar .fill{height:100%;background:#48bb78;border-radius:2px;transition:width .3s}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="header">
+<h1>Java 八股高频面试题</h1>
+<div class="sub">15天冲刺 · 70+题 · 点击题目展开答案</div>
+<div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
+<div class="search-bar">
+<input type="text" id="searchInput" placeholder="搜索题目或关键词...">
+<span class="ico">🔍</span>
+</div>
+</div>
+<div class="tabs" id="tabs"></div>
+<div class="content" id="content"></div>
+<div class="bottom-nav">
+<div class="nav-btn active" data-view="list"><span class="nav-ico">📋</span>题目</div>
+<div class="nav-btn" data-view="flash"><span class="nav-ico">🎴</span>背诵</div>
+<div class="nav-btn" data-view="star"><span class="nav-ico">⭐</span>收藏</div>
+</div>
+</div>
+<div class="flash-mode" id="flashMode">
+<div style="position:relative;width:100%;max-width:400px">
+<div class="flash-card" id="flashCard"></div>
+<div class="flash-btn">
+<button class="close" onclick="closeFlash()">✕</button>
+<button class="prev" onclick="prevCard()">← 上一题</button>
+<button class="flip" id="flipBtn" onclick="flipCard()">翻转</button>
+<button class="next" onclick="nextCard()">下一题 →</button>
+</div>
+</div>
+</div>
+<button class="fab" id="fabBtn" style="display:none">↑</button>
+
+<script>
+const DATA=[
+{day:"Day0",title:"十五天规划",tag:"design",questions:[
+{q:"十五天学习规划是怎样的？",a:"<p><b>第一阶段(Day1-2)</b>：Java基础与集合 — String/多态/接口/HashMap/ConcurrentHashMap</p><p><b>第二阶段(Day3-5)</b>：Java并发与JVM — 线程池/ThreadLocal/synchronized/CAS/AQS/volatile/JVM内存/GC</p><p><b>第三阶段(Day6-9)</b>：MySQL — 存储引擎/InnoDB/索引/事务/MVCC/锁/优化/日志</p><p><b>第四阶段(Day10-13)</b>：Redis — 数据结构/持久化/高可用/分布式锁/缓存一致性</p><p><b>第五阶段(Day14-15)</b>：Spring+综合 — AOP/Bean生命周期/事务/SpringBoot/项目复盘/模拟面试</p><div class='tip'>MySQL+Redis占60%，后端面试这两块考察最多</div>"},
+{q:"重点必背题清单有哪些？",a:"<p><b>Java</b>：HashMap底层原理+扩容、ConcurrentHashMap线程安全、synchronized与Lock、volatile原理、线程池参数、JVM内存结构、GC算法</p><p><b>MySQL</b>：InnoDB与MyISAM区别、B+树为什么适合做索引、聚簇与非聚簇索引、MVCC实现、事务隔离级别、索引失效场景</p><p><b>Redis</b>：Redis为什么快、5种基本类型、RDB vs AOF、缓存雪崩/击穿/穿透、分布式锁、缓存与数据库一致性</p>"}
+]},
+{day:"Day1",title:"Java基础",tag:"java",questions:[
+{q:"String、StringBuffer、StringBuilder有什么区别？",a:"<p><b>核心区别在于可变性和线程安全。</b></p><p>String不可变，final修饰字符数组，每次修改创建新对象。好处：hashcode可缓存、字符串常量池共享、天然线程安全。但拼接效率低，循环里用+每次都new新对象。</p><p>StringBuffer和StringBuilder都可变，继承AbstractStringBuilder，动态扩容。区别：StringBuffer加了synchronized（线程安全但慢），StringBuilder没加锁（快但不安全）。</p><div class='tip'>选择：单线程用StringBuilder（拼接日志/SQL），多线程共享用StringBuffer，不修改用String。我在项目里拼接告警日志用的就是StringBuilder</div>"},
+{q:"Java的多态是怎么实现的？说说原理",a:"<p><b>三个条件：继承、方法重写、向上转型。</b></p><p>继承是前提，子类继承父类；重写是子类用@Override重新定义父类方法；向上转型是声明类型为父类，实际对象是子类，如Animal a = new Dog()，调用a.eat()执行Dog的eat。</p><p>JVM层面依赖<b>动态分派</b>：invokevirtual指令在运行期根据实际类型查虚方法表(vtable)确定执行哪个方法。编译时看左边（声明类型），运行时看右边（实际类型）。</p><div class='tip'>实际价值是解耦。我在项目里用策略模式实现预警规则引擎，不同规则抽象成接口，运行时动态选择实现类——新增规则只加实现类，不改原有代码</div>"},
+{q:"接口和抽象类有什么区别？什么时候用哪个？",a:"<p><b>核心区别：抽象类表示'is-a'关系，接口表示'can-do'关系。</b></p><p>语法：抽象类用abstract class，可有构造方法、成员变量、普通方法；接口用interface，Java8后有default/static方法，Java9后有私有方法。一个类只能单继承抽象类，但可多实现接口。</p><p>场景：公共代码复用用抽象类（模板方法模式，父类定义流程子类实现差异）；跨继承树定义能力用接口（Comparable、Runnable）。</p><div class='tip'>我在项目里两种都用了：定义'预警扫描服务'用接口（行为契约），处理告警的基类用抽象类（提供公共通知、日志代码）</div>"},
+{q:"ArrayList和LinkedList有什么区别？分别什么时候用？",a:"<p>ArrayList底层<b>动态数组</b>，内存连续。查询O(1)，中间插入删除O(n)。扩容1.5倍。对CPU缓存友好，遍历性能好。</p><p>LinkedList底层<b>双向链表</b>，每个节点存数据和前后指针。查询O(n)，插入删除O(1)（但指定位置插入查找本身O(n)）。内存占用大（存前后指针）。</p><div class='tip'>绝大多数场景用ArrayList，业务上很少需要频繁头部插入。MyBatis-Plus返回的List默认也是ArrayList。LinkedList更多是面试题</div>"},
+{q:"Java线程安全问题通常怎么解决？有哪些方案？",a:"<p><b>六种方案，按场景选择：</b></p><p>1. synchronized — JVM层面自动加锁释放，JDK6后锁升级(偏向→轻量→重量)</p><p>2. ReentrantLock — 公平锁、可中断(lockInterruptibly)、tryLock超时、多Condition</p><p>3. volatile — 保证可见性+禁止重排，不保证原子性。适合一写多读，如标志位</p><p>4. 原子类(AtomicInteger) — CAS无锁并发，缺点是自旋开销大</p><p>5. 并发集合(ConcurrentHashMap、CopyOnWriteArrayList)</p><p>6. ThreadLocal — 线程隔离，每个线程自己的副本，适合保存线程上下文</p><div class='tip'>选型：能无锁就无锁(原子类/并发集合)→必须同步优先synchronized(语法简单)→需要高级特性用ReentrantLock</div>"},
+{q:"说一下Spring的IOC是什么？它有什么作用？",a:"<p><b>控制反转</b>：把对象创建和依赖管理权从代码反转给Spring容器。传统写法对象要自己new，用了IOC后对象只声明需要什么依赖，由容器负责创建和注入，这就是DI（依赖注入）——DI是IOC的实现方式。</p><p>三大作用：1.解耦（依赖接口不依赖实现）2.便于测试（可Mock依赖）3.生命周期管理（容器统一管创建、初始化、销毁）</p><div class='tip'>推荐构造器注入，依赖声明为final，Spring 4.3后单构造器可省@Autowired。我在项目里用@Configuration+@Bean配置第三方库Bean，用@ConditionalOnProperty实现条件装配</div>"}
+]},
+{day:"Day2",title:"集合框架",tag:"java",questions:[
+{q:"说一下HashMap的底层原理？",a:"<p><b>JDK1.8：数组+链表+红黑树。</b></p><p>主结构是Node数组，每个位置是一个桶。put时先计算hash，(n-1)&hash定位桶。空桶直接放入；有元素则链地址法挂到链表尾部。链表>8且数组>64时转红黑树，防止hash冲突严重时退化O(n)。</p><p>为什么用红黑树？自平衡，查找/插入/删除都是O(logn)，普通二叉树极端情况退化成链表。</p><p>负载因子为什么0.75？时间和空间折中，太大(如1.0)冲突增多，太小(如0.5)浪费空间。0.75时泊松分布下平均查找效率最优。</p><p><b>必背数字</b>：16初始容量、0.75负载因子、8转树、6退树、64转树前最小长度</p>"},
+{q:"HashMap什么时候扩容？扩容机制说一下",a:"<p>元素超过<b>容量×负载因子(16×0.75=12)</b>触发扩容，新容量2倍。扩容时创建新数组，所有元素重新计算位置(rehash)。</p><p>JDK1.8优化：rehash不用重算hash，因为容量是2的幂，元素位置要么不变要么变成原位置+旧容量。只需看hash新增高位0或1。</p><p>容量必须2的幂：让(n-1)&hash等价于hash%n，位运算更快。且2的幂减1后所有位都是1，hash值均匀分布。</p><div class='tip'>建议：能预估元素数量就初始化时指定容量，如放100个元素用new HashMap(128)</div>"},
+{q:"ConcurrentHashMap怎么保证线程安全的？",a:"<p><b>JDK1.8：CAS + synchronized。</b></p><p>put流程：1.计算hash定位桶 2.空桶用CAS插入(无锁性能高) 3.非空用synchronized锁住头节点 4.链表>8转红黑树</p><p>为什么不用ReentrantLock？synchronized在JDK6后性能优化好(偏向锁/轻量级锁)，且粒度更细——只锁一个桶的头节点，不同桶之间互不影响。</p><p>size()用baseCount+CounterCell数组(类似LongAdder)分散竞争。</p>"},
+{q:"HashMap和Hashtable有什么区别？现在还用Hashtable吗？",a:"<p>1.线程安全：HashMap不安全，Hashtable安全(全synchronized)。实际并发用ConcurrentHashMap，Hashtable基本被淘汰</p><p>2.null处理：HashMap允许key和value为null(key只能一个null)；Hashtable不允许任何null，否则抛NullPointerException</p><p>3.初始容量：HashMap 16扩2倍；Hashtable 11扩2n+1</p><p>4.hash计算：HashMap高16位异或低16位(让高位也参与运算)；Hashtable直接用hashCode</p><div class='tip'>为什么ConcurrentHashMap不允许null？多线程下get返回null分不清是'没有这个key'还是'value是null'，容易出bug</div>"},
+{q:"HashMap遍历时删除元素会抛异常吗？为什么？",a:"<p>会抛ConcurrentModificationException，这是<b>fail-fast机制</b>。</p><p>原理：HashMap有modCount字段记录修改次数，迭代器创建时记录当时的modCount，每次next()检查modCount是否变化，变了就抛异常。</p><p>注意：fail-fast是错误检测机制不是保证，多线程并发修改时不能保证一定抛异常。</p><div class='code'>// 错误：遍历时直接remove\nfor (String key : map.keySet()) {\n  if (key.equals('a')) map.remove(key);\n}\n// 正确：用迭代器remove\nIterator it = map.entrySet().iterator();\nwhile (it.hasNext()) {\n  if (it.next().getKey().equals('a')) it.remove();\n}\n// Java 8+ 推荐\nmap.entrySet().removeIf(e -> e.getKey().equals('a'));</div><div class='tip'>多线程下用ConcurrentHashMap，迭代器弱一致性，不抛异常也不保证看到最新修改</div>"}
+]},
+{day:"Day3",title:"并发编程",tag:"java",questions:[
+{q:"说一下线程池的参数和执行流程",a:"<p><b>ThreadPoolExecutor 7个参数：</b></p><p>1.corePoolSize核心线程数 2.maximumPoolSize最大线程数 3.keepAliveTime非核心线程空闲存活时间 4.unit时间单位 5.workQueue任务队列 6.threadFactory线程工厂 7.handler拒绝策略</p><p><b>执行流程(必背)：</b>1.核心线程没满→创建核心线程 2.满了→入队列 3.队列满→非核心线程 4.都满→拒绝策略</p><p><b>4种拒绝策略：</b>Abort(抛异常默认)、CallerRuns(提交线程执行,降级不丢任务)、Discard(丢弃)、DiscardOldest(丢最老再提交)</p><div class='warn'>阿里规约禁止Executors.newFixedThreadPool，因为用无界队列LinkedBlockingQueue(Integer.MAX_VALUE)可能OOM。应手动new ThreadPoolExecutor指定参数</div>"},
+{q:"ThreadLocal是干嘛用的？原理说一下",a:"<p>线程隔离：每个Thread有ThreadLocalMap，key是ThreadLocal(弱引用)，value是值(强引用)。</p><p>为什么key用弱引用？如果强引用，ThreadLocal对象在外部置null后仍被ThreadLocalMap引用无法回收。用弱引用后ThreadLocal可被GC回收。</p><p>内存泄漏：key被回收变null，但value强引用还在。线程池复用线程长期不销毁，value一直存在。</p><div class='code'>threadLocal.set(user);\ntry {\n  // 业务逻辑\n} finally {\n  threadLocal.remove(); // 必须清理\n}</div><div class='tip'>使用场景：保存用户上下文(登录态/用户ID)、数据库连接、SimpleDateFormat(非线程安全)</div>"},
+{q:"synchronized和Lock有什么区别？怎么选？",a:"<p>synchronized：关键字，JVM层面，自动加锁释放。JDK6后锁升级(偏向→轻量→重量)，性能接近Lock</p><p>Lock：接口(ReentrantLock)，API层面，手动lock/unlock(写finally里)。支持公平锁、lockInterruptibly可中断、tryLock超时、多Condition</p><p>功能差异：synchronized只能非公平、不可中断、不超时、一个条件(wait/notify)；Lock都支持</p><div class='tip'>普通场景用synchronized(语法简洁)，需要公平/可中断/超时/多条件用Lock</div>"},
+{q:"CAS是什么？ABA问题怎么解决？",a:"<p><b>Compare And Swap</b>：内存值V、预期值A、新值B。当且仅当V==A时更新为B，否则不操作。CPU cmpxchg指令保证原子。</p><p>Java应用：AtomicInteger等原子类底层用CAS，如incrementAndGet内部是CAS自旋。</p><p>ABA问题：线程1读A准备改C，线程2把A→B→A，线程1 CAS成功但不知道值被改过。</p><div class='tip'>解决：AtomicStampedReference加版本号，CAS同时比较值和版本号</div><p>CAS缺点：竞争激烈自旋开销大(CPU空转)；只能保证单变量原子(多变量用AtomicReference封装)</p>"},
+{q:"AQS是什么？原理说一下",a:"<p><b>AbstractQueuedSynchronizer</b>，并发工具基础框架。ReentrantLock/Semaphore/CountDownLatch都基于它。</p><p>核心：volatile int state + FIFO双向队列(CLH变种)</p><p>state含义因实现而异：ReentrantLock=重入次数(0没人用,1持有一次)；Semaphore=剩余许可数；CountDownLatch=剩余计数</p><p>工作流程(以ReentrantLock非公平锁为例)：1.CAS把state从0改1 2.成功拿到锁记录当前线程 3.失败入CLH队列阻塞 4.释放时唤醒队首</p><div class='tip'>设计模式：模板方法模式。AQS定义获取/释放流程骨架，子类实现tryAcquire/tryRelease</div>"},
+{q:"volatile有什么作用？什么场景用？",a:"<p><b>三大特性：保证可见性、禁止指令重排、不保证原子性。</b></p><p>可见性：volatile变量写立即刷新主内存，读从主内存读最新。底层是CPU内存屏障——写后Store屏障，读前Load屏障。</p><p>禁止重排：编译器和CPU为优化会重排指令，单线程没问题但多线程可能出错。经典应用——双重检查锁定单例：</p><div class='code'>public class Singleton {\n  private static volatile Singleton instance;\n  public static Singleton getInstance() {\n    if (instance == null) {\n      synchronized (Singleton.class) {\n        if (instance == null) {\n          instance = new Singleton();\n        }\n      }\n    }\n    return instance;\n  }\n}</div><p>new Singleton()分三步：分配内存、初始化、引用指向。不volatile可能重排成分配→引用指向→初始化，其他线程拿到未初始化对象。</p><div class='warn'>volatile int i; i++ 仍然不安全(读-改-写三步)，要用AtomicInteger</div>"}
+]},
+{day:"Day4",title:"JVM内存与类加载",tag:"jvm",questions:[
+{q:"说一下JVM的内存结构，都有哪些区域？",a:"<p><b>线程共享：</b>堆(对象实例+数组，GC主区域，新生代Eden+S0+S1+老年代)、方法区(类信息/常量/静态变量，JDK8前永久代，JDK8后元空间用本地内存)</p><p><b>线程隔离：</b>虚拟机栈(每方法一个栈帧，存局部变量/操作数栈/方法出口)、本地方法栈(服务native方法)、程序计数器(记录当前字节码行号)</p><div class='tip'>永久代→元空间原因：永久代大小固定(-XX:MaxPermSize)容易OOM，元空间用本地内存不易溢出。且永久代合并字符串常量池到堆方便GC</div>"},
+{q:"类加载的过程是怎样的？",a:"<p><b>五个阶段：加载→验证→准备→解析→初始化</b></p><p>加载：获取字节流转成运行时数据结构+生成Class对象</p><p>验证：检查字节码格式/元数据/字节码/符号引用合法性</p><p>准备：静态变量分配内存赋<b>默认值</b>(int=0,boolean=false)，static final常量赋代码值</p><p>解析：符号引用→直接引用</p><p>初始化：执行静态变量赋值和static代码块&lt;clinit&gt;</p><div class='tip'>初始化触发时机：new/getstatic/putstatic/invokestatic四条字节码指令、反射Class.forName、子类初始化时父类没初始化、主类(含main)</div>"},
+{q:"双亲委派模型是什么？为什么要这样设计？",a:"<p>层级：自定义→AppClassLoader→ExtClassLoader→BootstrapClassLoader</p><p>工作：收到请求先<b>向上委托</b>，父类能加载就加载，加载不了才回退给子类。</p><p>为什么双亲委派？</p><p>1.保证类的唯一性：同一个类只被加载一次，避免核心类被篡改。如java.lang.Object永远由启动类加载器加载</p><p>2.保证安全性：防止核心API被替换</p><div class='tip'>打破例子：Tomcat(每个web应用独立类加载器优先加载自己的)、SPI/JDBC(接口在rt.jar但实现在用户jar，需上下文类加载器反向找)、OSGi(网状类加载)</div>"},
+{q:"一个对象从new到可用，经历了哪些过程？",a:"<p>1.<b>类加载检查</b>：遇到new指令先检查类是否被加载、解析、初始化</p><p>2.<b>分配内存</b>：指针碰撞(内存规整时移动指针)或空闲列表(不规整时找合适块)。并发安全用CAS+失败重试或TLAB(每线程在Eden预分配一小块)</p><p>3.<b>内存初始化</b>：分配后清零(不含对象头)，保证字段默认值</p><p>4.<b>设置对象头</b>：Mark Word(hash/GC分代年龄/锁状态)+类元信息指针</p><p>5.<b>执行init</b>：构造方法赋值字段</p>"},
+{q:"线上OOM你怎么排查？",a:"<p><b>常见OOM类型：</b>Java heap space(堆溢出,对象太多)、Metaspace(元空间,加载类太多如动态代理)、unable to create new native thread(线程太多)、StackOverflowError(递归太深)</p><p><b>排查步骤：</b>1.加-XX:+HeapDumpOnOutOfMemoryError自动dump 2.用MAT/JProfiler分析dump找最大对象和引用链 3.看GC日志(频繁Full GC但回收不掉) 4.根据引用链代码定位</p><div class='tip'>常见原因：集合只put不remove(缓存泄漏)、ThreadLocal没remove、大量动态生成类(如cglib代理)、数据库结果集没关、静态集合无限增长</div>"}
+]},
+{day:"Day5",title:"JVM GC与调优",tag:"jvm",questions:[
+{q:"JVM怎么判断对象能不能被回收？",a:"<p><b>可达性分析</b>：从GC Roots遍历引用链，到达不了的可回收。Java不用引用计数法(解决不了循环引用)。</p><p>GC Roots：虚拟机栈中局部变量、方法区类静态变量、方法区常量、本地方法栈JNI引用、虚拟机内部引用、同步锁持有对象</p><p><b>四种引用：</b>强引用(不回收)、软引用SoftReference(内存不足回收，适合缓存)、弱引用WeakReference(下次GC回收，ThreadLocalMap的key)、虚引用PhantomReference(回收时通知)</p>"},
+{q:"说一下GC的几种算法",a:"<p><b>标记-清除</b>：先标记存活再清除可回收。缺点：内存碎片，大对象可能找不到连续空间</p><p><b>标记-复制</b>：分两块只用一块，GC时复制存活到另一块再清空。优点：无碎片；缺点：浪费一半。新生代用这个(大部分对象朝生夕死，复制少)</p><p><b>标记-整理</b>：标记后存活向一端移动，清理边界外。无碎片不浪费但移动开销大。老年代用</p><p><b>分代收集</b>：HotSpot堆分新生代和老年代，新生代用复制(Eden+2个Survivor)，老年代用标记-整理或标记-清除</p>"},
+{q:"常见的垃圾回收器有哪些？有什么区别？",a:"<p><b>Serial/Serial Old</b>：单线程STW，客户端小应用</p><p><b>Parallel Scavenge/Old</b>：多线程并行，JDK8默认，关注吞吐量，适合后台计算</p><p><b>CMS</b>：低停顿，四阶段(初始标记STW→并发标记→重新标记STW→并发清除)。标记-清除有碎片。JDK9废弃JDK14移除</p><p><b>G1</b>：JDK9+默认。堆分Region(1-32MB)不再严格分代，预测停顿时间选价值最高Region(Garbage First)。整体标记-整理局部复制</p><div class='tip'>堆小用Parallel，堆大(4GB+)低停顿用G1，未来ZGC更优</div>"},
+{q:"你做过GC调优吗？怎么调？",a:"<p><b>常用参数：</b>-Xms/-Xmx(初始/最大堆，建议设一样避免动态扩容)、-Xmn(新生代)、-XX:SurvivorRatio=8(Eden:Survivor=8:1)、-XX:+UseG1GC、-XX:MaxGCPauseMillis=200(G1目标停顿)</p><p><b>调优思路：</b>1.看GC日志找Full GC频繁或停顿长 2.老年代增长快→可能大对象直接进老年代，调大新生代 3.碎片问题→换G1 4.用jstat/jcmd/GCViewer监控</p><div class='tip'>Full GC频繁：可能新生代太小、大对象多、内存泄漏；Young GC慢：Survivor太大不均衡</div>"}
+]},
+{day:"Day6",title:"MySQL基础与存储引擎",tag:"mysql",questions:[
+{q:"MySQL有哪些存储引擎？InnoDB和MyISAM有什么区别？",a:"<p>InnoDB：支持事务(ACID)、行锁、外键、聚簇索引、崩溃恢复(redolog)。MySQL5.5后默认</p><p>MyISAM：不支持事务、表锁、非聚簇索引、查询快全文索引好。MySQL5.5+基本不用了</p><p>Memory：数据存内存，速度快但重启丢失，适合临时表</p><div class='tip'>现在几乎都用InnoDB。我项目里所有表都是InnoDB，因为心理咨询数据涉及用户隐私和告警记录，必须有事务保证</div>"},
+{q:"InnoDB的架构是怎样的？",a:"<p><b>内存结构：</b>Buffer Pool(缓存数据页和索引页，最重要)、Change Buffer(缓存非唯一二级索引修改，等空闲时合并)、Adaptive Hash Index(自动监控热点建哈希)、Log Buffer(缓存redolog定期刷盘)</p><p><b>磁盘结构：</b>系统表空间(数据字典/双写缓冲)、独立表空间(.ibd文件)、redo log(物理日志崩溃恢复)、undo log(逻辑日志回滚+MVCC)、binlog(Server层逻辑日志主从复制)</p><p><b>后台线程：</b>Master Thread(核心刷脏页/合并change buffer)、IO Thread(异步IO)、Purge Thread(清undo)、Page Cleaner(刷脏页)</p>"},
+{q:"一条SQL语句在MySQL里是怎么执行的？",a:"<p>1.<b>连接器</b>：建立TCP连接，校验用户名密码，拉取权限</p><p>2.<b>分析器</b>：词法+语法分析，解析树，检查表名/字段名</p><p>3.<b>优化器</b>：选索引、定连接顺序、生成执行计划(如两个索引可用选成本低的)</p><p>4.<b>执行器</b>：调存储引擎接口执行</p><p>5.<b>存储引擎</b>：InnoDB负责具体数据读写</p><p><b>更新流程(重要，涉及日志)：</b>找数据→改→写undo log→写redo log(prepare)→写binlog→提交事务redo log改commit<b>(两阶段提交)</b></p>"},
+{q:"MySQL索引是什么？为什么用B+树？",a:"<p>B+树四大优势：</p><p>1.磁盘IO少：每节点存多个key(16KB页存上千key)，3-4层存千万数据，查一次最多3-4次IO。对比二叉树1000万数据24层</p><p>2.范围查询高效：只有叶子节点存数据，叶子节点双向链表连接，定位起点后顺着扫</p><p>3.查询稳定：每次都到叶子节点，路径长度相同。B树非叶子也可能命中，性能不稳定</p><p>4.排序友好：叶子节点本身有序链表，order by直接扫</p><div class='tip'>Hash索引等值O(1)但不支持范围查询和排序。Memory引擎才用Hash，OLTP用B+树更合适</div>"}
+]},
+{day:"Day7",title:"MySQL索引深入",tag:"mysql",questions:[
+{q:"为什么MySQL索引用B+树？不用二叉树、红黑树或Hash？",a:"<p>四大优势：</p><p>1.磁盘IO少：16KB页存上千key，3-4层存千万数据，查一次最多3-4次IO。二叉树1000万数据24层</p><p>2.范围查询高效：只有叶子节点存数据，双向链表连接，定位起点后顺着扫</p><p>3.查询稳定：每次都到叶子节点，路径长度相同。B树非叶子也可能命中，性能不稳定</p><p>4.排序友好：叶子节点本身有序链表</p><div class='tip'>Hash索引等值O(1)但不支持范围查询/排序/最左前缀。Memory引擎才用Hash，OLTP用B+树更合适</div>"},
+{q:"聚簇索引和非聚簇索引有什么区别？",a:"<p><b>聚簇索引</b>：数据和主键索引存在同一个B+树，叶子节点存完整行数据。InnoDB主键就是聚簇索引。一张表只能有一个</p><p><b>非聚簇索引(二级索引)</b>：叶子节点存主键值，不是完整行。查到主键后要<b>回表</b>去聚簇索引查完整数据</p><p>为什么二级索引存主键？存主键占空间小，且保证数据一致性(更新只改聚簇索引)</p><p><b>覆盖索引</b>：查询列都在索引里不用回表。如select id,name from user where name=张三，name上有联合索引(name,id)</p><div class='tip'>建议：必须建主键，推荐自增整型。自增→顺序追加避免页分裂；整型→比UUID省空间，二级索引存主键也省</div>"},
+{q:"什么是回表？怎么避免？",a:"<p>回表 = 二级索引查到主键 → 再去聚簇索引查完整行数据。多一次B+树查找。</p><div class='code'>-- 回表\nselect * from user where name = '张三';\n-- 覆盖索引(不回表)\nselect id, name from user where name = '张三';</div><p>EXPLAIN看Extra：Using index=覆盖索引没回表；Using index condition或空=可能回表</p><div class='tip'>优化：高频查询用覆盖索引，避免select*，只查需要的列，必要时建联合索引</div>"},
+{q:"联合索引的最左前缀原则是什么意思？",a:"<p>联合索引(a,b,c)可用于：where a=? / where a=? and b=? / where a=? and b=? and c=?</p><p><b>不能</b>用于：where b=? / where c=? / where a=? and c=?（中间跳了b）</p><p>原理：B+树叶子节点按索引字段顺序排列，先按a排序，a相同再按b，b相同再按c。查询必须从a开始才能用到索引。</p><div class='warn'>范围查询会中断后续索引：where a>1 and b=2 → a走索引b用不到；where a=1 and b>2 and c=3 → a、b走索引c用不到</div><div class='tip'>联合索引字段顺序按区分度从高到低排，等值查询放前面，范围查询放后面</div>"},
+{q:"什么情况下索引会失效？",a:"<p>1.函数操作：where YEAR(create_time)=2026 ❌ → 改成范围查询</p><p>2.隐式类型转换：phone是varchar但where phone=13800000000 ❌</p><p>3.模糊查询：where name like '%张三' ❌（'张三%'可以）</p><p>4.不等于：where status != 1 通常走全表</p><p>5.OR连接：where a=1 or b=2，b没索引整个走全表</p><p>6.索引列运算：where id+1=10 ❌</p><p>7.不符合最左前缀</p><p>8.优化器选择：数据分布不均可能判断全表比走索引快，主动放弃索引</p>"}
+]},
+{day:"Day8",title:"MySQL事务与锁",tag:"mysql",questions:[
+{q:"事务的ACID是什么？MySQL有哪些隔离级别？",a:"<p><b>ACID：</b>原子性(undo log实现回滚)、一致性(三者共同保证)、隔离性(锁+MVCC实现)、持久性(redo log+Buffer Pool实现，崩溃后恢复)</p><p><b>四级隔离(从低到高)：</b>1.读未提交(可能脏读) 2.读已提交RC(可能不可重复读) 3.可重复读RR(可能幻读，MySQL用间隙锁解决) 4.串行化(无并发问题但性能差)</p><p>MySQL默认RR，Oracle和PostgreSQL默认RC</p><p><b>三个并发问题：</b>脏读(读未提交数据)、不可重复读(同事务两次读同一行结果不同)、幻读(同事务两次查询行数不同)</p>"},
+{q:"MVCC是什么？怎么实现的？",a:"<p><b>多版本并发控制</b>：读不加锁也能保证隔离性，提升并发性能。</p><p><b>三个核心组件：</b></p><p>1.隐藏字段：DB_TRX_ID(最后修改的事务ID)、DB_ROLL_PTR(回滚指针指向undo log上一版本)</p><p>2.undo log版本链：每次修改生成undo log，通过回滚指针串成链表构成多版本</p><p>3.ReadView：SELECT时生成快照，含m_ids(活跃事务列表)、min_trx_id、max_trx_id、creator_trx_id</p><p><b>可见性判断：</b>trx_id==creator可见；<min可见；>=max不可见；在m_ids里不可见不在可见</p><div class='tip'>RC每次SELECT生成新ReadView(看到已提交)；RR第一次SELECT生成，整个事务复用(可重复读)</div>"},
+{q:"MySQL的行锁和表锁有哪些？",a:"<p><b>行锁：</b>记录锁(锁一条记录)、间隙锁(锁范围防插入)、临键锁(记录+间隙，RR默认)、插入意向锁(互相不冲突但和间隙锁冲突)</p><p><b>表锁：</b>表锁(lock tables显式)、元数据锁MDL(改表结构时自动加)、意向锁IS/IX(加行锁前先加，加速判断冲突)</p><div class='warn'>InnoDB默认行锁，但没用索引时行锁退化为表锁！所以SQL一定要走索引</div><p>S锁(select...lock in share mode)共享允许读不能写；X锁(select...for update或update/delete)排他不能读写</p>"},
+{q:"MySQL死锁怎么产生的？怎么排查和避免？",a:"<p><b>四个条件(同时满足)：</b>互斥、持有并等待、不可剥夺、循环等待</p><p>示例：事务A先锁id=1再锁id=2，事务B先锁id=2再锁id=1→死锁</p><p>InnoDB默认开启死锁检测(innodb_deadlock_detect=ON)，发现死锁回滚一个事务。代价是消耗CPU</p><div class='tip'>避免：1.加锁顺序一致(按主键升序) 2.大事务拆小减少锁持有时间 3.走索引避免锁升级成表锁 4.降低隔离级别用RC</div><p>排查：show engine innodb status看LATEST DETECTED DEADLOCK</p>"},
+{q:"MySQL是怎么解决幻读的？",a:"<p>RR级别通过<b>间隙锁</b>解决幻读。</p><p>幻读定义：同一事务内两次相同查询返回行数不同(其他事务插入/删除了符合条件的行)。</p><p>间隙锁怎么解决：假设有数据id=5,10,15，select...where id between 5 and 15 for update→加记录锁锁5/10/15 + 间隙锁锁(5,10)和(10,15)，其他事务无法插入id=6~14</p><p>Next-Key Lock = 记录锁+间隙锁，锁住(前值,当前值]左开右闭区间</p><div class='warn'>间隙锁副作用：锁范围扩大，并发下降。即使没匹配记录也会加间隙锁。RC没有间隙锁所以可能有幻读</div>"},
+{q:"意向锁是什么？有什么用？",a:"<p><b>表级锁</b>，用于快速判断表上是否有冲突的行锁。</p><p>没有意向锁：加表锁时要遍历所有行看有没有行锁，太慢</p><p>有意向锁：加行锁前先加意向锁(IS准备加S锁/IX准备加X锁)，加表锁时只看意向锁</p><div class='tip'>意向锁之间互相兼容(IS兼容IX)，因为只表示'打算加行锁'，具体冲突看行锁</div>"}
+]},
+{day:"Day9",title:"MySQL优化与日志",tag:"mysql",questions:[
+{q:"线上SQL慢，你怎么排查和优化？",a:"<p><b>排查流程：</b>1.开启慢查询日志(slow_query_log=ON, long_query_time=1) 2.EXPLAIN看执行计划</p><p>EXPLAIN关键字段：type(至少range/ref)、possible_keys(可能用的索引)、key(实际用的索引)、rows(预估扫描行数)、Extra(Using index好/Using filesort要优化/Using temporary要优化)</p><p><b>优化方向：</b>全表扫描→加索引；索引失效→改SQL(避免函数/隐式转换/左模糊)；回表多→覆盖索引；排序慢→加排序索引；分页慢→子查询或游标分页</p><div class='code'>-- 慢：深度分页\nselect * from user limit 1000000, 10;\n-- 快：子查询+主键\nselect * from user where id >= (\n  select id from user order by id limit 1000000, 1\n) order by id limit 10;\n-- 更快：游标分页(记住上页最后id)\nselect * from user where id > 1000000 order by id limit 10;</div>"},
+{q:"EXPLAIN里的type字段有哪些值？怎么看？",a:"<p>从快到慢：</p><p>system(表只有一行) > const(主键或唯一索引等值) > eq_ref(联表被驱动表用主键) > ref(普通索引等值) > range(范围查询) > index(扫整棵索引树) > ALL(全表扫描)</p><div class='tip'>至少要达到range或ref级别。ALL最差必须优化。Extra关注：Using index(覆盖索引好)、Using filesort(额外排序要优化)、Using temporary(临时表要优化)、Using join buffer(联表无索引必须优化)</div>"},
+{q:"redo log和binlog有什么区别？为什么要两阶段提交？",a:"<p><b>redo log</b>：物理日志(记录页的某偏移改成什么)，InnoDB引擎层，崩溃恢复保证持久性，大小固定循环写</p><p><b>binlog</b>：逻辑日志(记录SQL或行变更)，Server层所有引擎共用，主从复制+数据恢复，追加写</p><p>为什么有两个？历史原因——InnoDB自己有redo log保证持久性，MySQL Server层有binlog用于复制</p><p><b>两阶段提交</b>(保证redo log和binlog一致性)：1.写redo log(prepare) 2.写binlog 3.提交事务redo log改commit</p><div class='tip'>崩溃恢复：redo prepare+binlog完整→提交；prepare+binlog不完整→回滚；commit→已完成</div>"},
+{q:"undo log有什么用？长事务为什么不好？",a:"<p><b>两个作用：</b>1.事务回滚(记录修改前数据，回滚时反向操作) 2.MVCC多版本(undo log串成版本链，沿链找可见版本)</p><p>undo log何时删：有purge线程定期清理，当没有ReadView需要这个版本时(所有依赖的事务都提交了)</p><div class='warn'>长事务持有ReadView导致undo log不能清理，版本链越来越长，查询性能下降，undo表空间膨胀。这就是生产环境要避免长事务的原因</div>"},
+{q:"MySQL主从复制的原理是什么？",a:"<p>1.主库写binlog 2.从库IO Thread连接主库请求binlog 3.主库Binlog Dump Thread发送 4.从库写relay log(中继日志) 5.从库SQL Thread读relay log重放SQL更新数据</p><p><b>复制方式：</b>异步(默认，主库写完立即返回不等从库，可能丢数据)、半同步(等至少一个从库收到binlog才返回)、组复制MGR(基于Paxos多主强一致)</p><p>主从延迟：从库SQL Thread单线程重放可能跟不上。解决：MySQL5.7+并行复制(基于组提交)、从库SSD、大事务拆小</p>"}
+]},
+{day:"Day10",title:"Redis基础与数据结构",tag:"redis",questions:[
+{q:"Redis是什么？为什么这么快？",a:"<p>基于内存的key-value数据库，单线程模型，常用于缓存、分布式锁、消息队列。</p><p><b>四大原因：</b></p><p>1.基于内存：内存读写远超磁盘，这是快的根本原因</p><p>2.单线程避免上下文切换：没有多线程切换、加锁的开销。Redis6引入多线程只处理网络IO，命令执行还是单线程</p><p>3.IO多路复用：用epoll/select/kqueue实现一个线程监听多个socket，哪个有数据就处理</p><p>4.高效数据结构：SDS、ziplist、quicklist、skiplist都经过优化</p><div class='tip'>单线程还能高并发：瓶颈不在CPU而在网络和内存。内存操作纳秒级，单线程也能10万+QPS</div>"},
+{q:"Redis有哪些数据类型？分别用在什么场景？",a:"<p><b>5种基本类型必背：</b></p><p>String → 缓存/计数器/分布式锁 (底层SDS动态字符串)</p><p>List → 消息队列/最新列表 (底层quicklist双向链表+ziplist)</p><p>Hash → 对象存储/用户信息 (底层ziplist+hashtable)</p><p>Set → 去重/共同好友 (底层intset+hashtable)</p><p>ZSet → 排行榜/延迟队列 (底层ziplist+skiplist跳表)</p><div class='tip'>数据量小(128元素/64字节)用紧凑结构省内存，大时切换到hashtable/skiplist保证性能</div>"},
+{q:"String的底层SDS和C字符串有什么区别？",a:"<p>Redis没用C字符串，而是自己实现的SDS(Simple Dynamic String)。</p><p>1.<b>O(1)获取长度</b>：直接读len字段，C要遍历找\\0</p><p>2.<b>二进制安全</b>：不依赖\\0判结束，可存图片/序列化数据</p><p>3.<b>杜绝缓冲区溢出</b>：append前检查空间，不够就扩容</p><p>4.<b>减少内存分配</b>：预分配(<1M翻倍，>1M加1M)+惰性释放(不立即释放留作下次用)</p><p>5.兼容部分C字符串函数：末尾仍保留\\0</p>"},
+{q:"ZSet底层的跳表是什么？为什么不用红黑树？",a:"<p>跳表 = 多层链表。最底层完整链表，上层抽样稀疏链表。查找从最高层开始，遇大的就下降一层。</p><p><b>跳表 vs 红黑树：</b>跳表实现简单、范围查询高效(顺着底层链表扫)、内存略多(每层冗余指针)；红黑树查找稳定O(logn)但实现复杂</p><div class='tip'>Redis选跳表原因(作者原话)：1.内存占用可调(控制概率) 2.实现简单 3.范围查询方便</div>"},
+{q:"ZSet什么时候用ziplist，什么时候用skiplist？",a:"<p>ziplist：元素<128且每个<64字节。内存连续CPU缓存友好，查找O(n)但数据少可接受</p><p>skiplist+dict：超阈值时切换。skiplist按分数排序支持范围查询O(logn)，dict按member查score O(1)</p><p>为什么用两个结构？单独skiplist查member的score是O(logn)，单独dict无法按分数排序。两者结合：skiplist负责排序，dict负责O(1)查找</p>"}
+]},
+{day:"Day11",title:"Redis持久化与过期",tag:"redis",questions:[
+{q:"Redis的RDB持久化是什么原理？",a:"<p><b>全量快照</b>，把内存中所有数据生成快照存到磁盘。</p><p>触发：手动save(阻塞)/bgsave(后台)、自动(配置save 900 1即900s内1次修改)、shutdown、主从复制</p><p>bgsave流程：主进程fork子进程(copy-on-write)→子进程遍历所有数据写RDB→写完替换旧文件→子进程退出</p><p>优点：文件小恢复快，适合备份和灾难恢复。缺点：两次快照之间宕机会丢数据，fork大数据集较慢</p>"},
+{q:"AOF呢？和RDB有什么区别？",a:"<p><b>增量日志</b>，每条写命令追加到文件。RDB是全量快照，AOF是增量日志。</p><p>三种刷盘策略：always(每条命令fsync最安全但慢)、everysec(默认每秒fsync最多丢1秒)、no(由OS决定)</p><p>AOF重写：文件太大时把多条命令合并成等价最小命令集(如对同一key的100次set重写成最后一条)</p><p><b>RDB保速度AOF保安全</b>：RDB文件小恢复快但可能丢几分钟数据；AOF数据安全(最差丢1秒)但文件大恢复慢(要重放所有命令)</p>"},
+{q:"RDB和AOF怎么选？生产环境用什么？",a:"<p>只做缓存丢数据无所谓→只用RDB</p><p>数据重要不能丢→AOF+everysec</p><p>既要安全又要恢复快→RDB+AOF都开(推荐生产)</p><div class='tip'>Redis4.0混合持久化：AOF重写时把当前内存数据用RDB格式写到AOF开头，后续命令追加。重启时先加载RDB(快)再重放少量命令(少)，兼顾速度和安全。生产环境推荐开启</div>"},
+{q:"Redis的过期策略和内存淘汰策略有什么区别？",a:"<p><b>过期策略</b>(针对设了TTL的key)：Redis用两者结合</p><p>惰性过期(访问key时检查是否过期，过期就删)+定期过期(每100ms随机抽取一部分设TTL的key检查，过期比例超25%继续抽)</p><p><b>内存淘汰策略</b>(内存达maxmemory时)：</p><p>noeviction(不删除写入报错，默认)、allkeys-lru(所有key淘汰最久未用的)、allkeys-lfu、allkeys-random、volatile-lru(设TTL的key淘汰)、volatile-lfu、volatile-random、volatile-ttl(淘汰快过期的)</p><div class='tip'>缓存场景用allkeys-lru；有持久数据不希望被淘汰用volatile-lru</div>"},
+{q:"LRU和LFU有什么区别？Redis怎么实现的？",a:"<p><b>LRU</b>(最近最少使用)：淘汰最久没访问的。假设'最近访问的将来还会访问'。Redis用近似LRU：随机抽样(默认5个)淘汰最久未用的，4.0+在候选池中淘汰更接近真实LRU</p><p><b>LFU</b>(最不经常使用)：淘汰访问频率最低的。解决LRU的'扫描一次性读大量数据把热点挤掉'问题。Redis用Morris计数器：访问计数+1，但每次访问计数衰减，避免历史热点一直占用</p><div class='tip'>偶尔访问的冷数据LRU可能保留LFU会淘汰；周期性访问的热数据LFU比LRU更合理</div>"}
+]},
+{day:"Day12",title:"Redis高可用",tag:"redis",questions:[
+{q:"Redis主从复制的原理是什么？",a:"<p><b>全量复制</b>(首次或断线太久)：从节点PSYNC→主节点bgsave生成RDB→发送→从节点加载→主节点发送缓冲区新命令</p><p><b>增量复制</b>(断线重连)：从节点PSYNC{runid}{offset}→主节点检查runid是否一致、offset是否在复制缓冲区→一致就发offset之后的命令→不一致走全量</p><p>复制缓冲区(repl_backlog)：环形缓冲区默认1MB，断线太久offset被覆盖就只能全量</p>"},
+{q:"哨兵是干嘛的？故障转移怎么做的？",a:"<p><b>三大任务：</b>1.监控(每个Sentinel每秒ping主从节点，超时标记主观下线) 2.通知(客户端订阅事件) 3.自动故障转移</p><p><b>故障转移流程：</b>1.主观下线(一个Sentinel发现) 2.quorum个Sentinel同意→客观下线 3.选举Sentinel leader(Raft协议) 4.leader选新主(优先级高/offset大/runid小) 5.其他从节点指向新主 6.旧主恢复变从</p><p>客户端如何感知主切换？连接Sentinel订阅switch-master事件，主节点变更时Sentinel推送新地址</p>"},
+{q:"Redis集群是怎么分片的？",a:"<p><b>16384个槽</b>，key通过CRC16计算hash对16384取模得到slot，分配到不同节点。如3个节点分别负责0-5460/5461-10922/10923-16383</p><p>节点通信：Gossip协议，每1-2秒交换信息(PING/PONG)，包含自己负责的slot和其它节点状态</p><p>客户端路由：1.发任意节点 2.节点检查key的slot是否归自己 3.是就处理，不是返回MOVED错误 4.客户端缓存slot到节点映射，下次直接找对</p><div class='tip'>为什么16384个槽(作者说)：心跳包位图2KB合适；节点数一般不超1000；8位太细浪费</div>"},
+{q:"缓存雪崩、击穿、穿透分别是什么？怎么解决？",a:"<p><b>雪崩</b>：大量缓存同时失效→请求全打到数据库被压垮。原因：大量key同时过期或Redis宕机。解决：过期时间加随机值、多级缓存(本地+Redis)、限流降级、Redis高可用(主从+哨兵)</p><p><b>击穿</b>：一个热点key失效→瞬间大量请求打数据库。解决：热点key永不过期、加互斥锁(一个请求查库其他等待)、逻辑过期(存过期时间但不真过期，过期后异步刷新)</p><p><b>穿透</b>：查数据库和缓存都不存在的key每次都查库。解决：缓存空值(null)设短过期、布隆过滤器(请求前先过滤掉一定不存在的)、接口参数校验</p><div class='tip'>雪崩=大量key失效，击穿=单个热点key失效，穿透=数据根本不存在</div>"}
+]},
+{day:"Day13",title:"Redis应用场景",tag:"redis",questions:[
+{q:"Redis怎么实现分布式锁？有什么问题？",a:"<p><b>基础实现：</b>SET lock_key unique_value NX PX 30000</p><p>NX：key不存在才设置；PX 30000：过期30秒防止持有者宕机后锁无法释放；unique_value：唯一标识保证只有自己能释放</p><p>释放锁(Lua保证原子)：get比较value相等才del</p><p><b>问题1</b>业务超时锁过期→唯一值+Lua校验只释放自己的锁。但A业务没完B也在执行，可能并发问题</p><p><b>问题2</b>锁过期业务未完成→Redisson看门狗(watchdog)：拿到锁后开启后台线程每1/3过期时间(默认10s)续期，业务完成才停止</p><p><b>问题3</b>主从切换丢锁→Redlock(在多个独立Redis实例上加锁，过半成功才算成功)。争议大</p><div class='tip'>生产用Redisson即可，对一致性要求极高用ZooKeeper/etcd</div>"},
+{q:"缓存和数据库怎么保证一致性？",a:"<p><b>推荐方案：先更新库再删缓存+延迟双删</b></p><p>1.删除缓存 2.更新数据库 3.延迟一段时间(如500ms) 4.再次删除缓存</p><p>为什么是删缓存而不是更新缓存？删除是幂等的(更新可能并发覆盖)；写多读少时更新浪费；缓存可能复杂(多表join)更新成本高</p><p>删除失败兜底：消息队列重试(删失败发MQ消费者重试) / 订阅binlog(用Canal监听MySQL变更删缓存)</p><div class='tip'>分布式系统强一致代价大，多数场景最终一致性够用。强一致用2PC/TCC但性能差</div>"},
+{q:"用Redis怎么做限流？",a:"<p><b>方案1计数器(固定窗口)</b>：INCR+EXPIRE每分钟。缺点：临界点问题(59秒和1秒各来100次，2秒内200次)</p><p><b>方案2滑动窗口(ZSet)</b>：ZADD时间戳作score，ZREMRANGEBYSCORE删60秒前数据，ZCARD统计当前元素数。解决临界点</p><p><b>方案3令牌桶(Lua)</b>：按速率发令牌请求消耗，允许突发(桶里攒的令牌)。适合大多数场景</p><p><b>方案4漏桶</b>：固定速率漏出请求，平滑流量不允许突发</p>"},
+{q:"用Redis实现排行榜怎么做？",a:"<p>ZSet经典应用。</p><div class='code'>ZADD rank:game &lt;score&gt; &lt;user_id&gt;   # 添加/更新分数\nZINCRBY rank:game &lt;delta&gt; &lt;user_id&gt;  # 加分\nZRANK rank:game &lt;user_id&gt;           # 获取排名(从0)\nZREVRANK rank:game &lt;user_id&gt;        # 倒序排名(分数高在前)\nZRANGE rank:game 0 9 REV WITHSCORES # 获取前10名</div><p>ZSet适合排行榜：自动按score排序、插入和查询O(logn)、支持范围查询取前N名</p>"},
+{q:"Redis能做消息队列吗？和专业的MQ比有什么优缺点？",a:"<p><b>方案1 List+BLPOP</b>：LPUSH生产，BRPOP消费(阻塞)。简单但无ACK，消息只能消费一次</p><p><b>方案2 Pub/Sub</b>：SUBSCRIBE/PUBLISH。真广播但消息不持久，离线丢</p><p><b>方案3 Stream(5.0+)</b>：XADD生产，XREAD消费，XGROUP创建消费组，XACK确认。支持持久化/消费组/ACK，最接近专业MQ</p><div class='tip'>轻量级用Stream，专业场景用Kafka/RabbitMQ。Stream不如专业MQ强大(无分区、无事务)</div>"}
+]},
+{day:"Day14",title:"Spring+项目复盘",tag:"spring",questions:[
+{q:"说一下Spring AOP的原理？JDK和CGLIB动态代理有什么区别？",a:"<p>AOP = 面向切面编程，把横切关注点(日志/事务/权限)从业务逻辑中抽离，底层靠<b>动态代理</b>实现。</p><p><b>四个核心概念：</b>切面(Aspect)=横切关注点模块化；切点(Pointcut)=定义哪些方法生效；通知(Advice)=在切点处做什么(前置/后置/环绕/异常/返回)；织入(Weaving)=把切面应用到目标对象，Spring是运行期织入</p><p><b>JDK代理</b>：要求目标类实现接口，Proxy.newProxyInstance创建代理，内部用反射调用。不能代理final类和final方法</p><p><b>CGLIB代理</b>：不需要接口，通过生成目标类的子类实现，用ASM操作字节码，比反射快</p><div class='tip'>Spring选择：有接口默认JDK(可强制CGLIB设proxy-target-class=true)，没接口用CGLIB。建议统一CGLIB避免代理类型不一致。通知顺序(5.2.7后)：@Around前→@Before→目标方法→@AfterReturning/@AfterThrowing→@After→@Around后</div>"},
+{q:"Spring Bean的生命周期说一下？循环依赖怎么解决的？",a:"<p><b>四阶段：</b>实例化→属性赋值→初始化→销毁</p><p>初始化最复杂：先调Aware接口(BeanNameAware/BeanFactoryAware/ApplicationContextAware)→BeanPostProcessor.before→@PostConstruct/afterPropertiesSet/init-method→BeanPostProcessor.after(AOP代理在这里生成)→销毁：@PreDestroy/DisposableBean/destroy-method</p><p><b>循环依赖靠三级缓存：</b>singletonObjects(完整对象)、earlySingletonObjects(半成品)、singletonFactories(工厂)。A创建中需要注入B，B创建中需要注入A，从三级缓存拿A的工厂提前暴露半成品给B，B完成后注入A，A完成</p><div class='warn'>只能解决单例setter注入的循环依赖，构造器注入无法解决(实例化阶段还没到三级缓存)。三级缓存意义在于需要AOP时工厂能生成代理对象</div>"},
+{q:"Spring事务的原理是什么？哪些场景会失效？",a:"<p>事务本质是AOP的典型应用，通过动态代理在方法前后加开启事务和提交/回滚逻辑。</p><p><b>7种传播行为：</b>REQUIRED(默认,有事务加入没有新建)、REQUIRES_NEW(总是新建并挂起当前)、NESTED(嵌套事务基于savepoint)、SUPPORTS、NOT_SUPPORTED、NEVER、MANDATORY</p><p><b>6种失效场景：</b>1.方法非public(AOP默认只代理public) 2.自调用(同类A调B，B的@Transactional不生效，没走代理是this调用) 3.异常被catch吞掉 4.抛非RuntimeException(默认只回滚RuntimeException和Error，需rollbackFor指定) 5.数据库不支持事务(如MyISAM) 6.事务管理器没配置</p><div class='tip'>自调用解决三种方式：注入self代理调用(self.b()) / AopContext.currentProxy()拿到代理 / 拆到两个类。我在项目里处理告警事务隔离时用注入self的方式</div>"},
+{q:"SpringBoot的自动配置原理说一下？",a:"<p>入口是@SpringBootApplication = @SpringBootConfiguration + @ComponentScan + @EnableAutoConfiguration</p><p>@EnableAutoConfiguration通过@Import(AutoConfigurationImportSelector)读取META-INF/spring.factories(SpringBoot2.x)或META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports(SpringBoot3.x)，拿到所有自动配置类，然后根据@ConditionalOnXxx过滤，满足条件的才生效</p><p><b>常见条件注解：</b>@ConditionalOnClass(类路径有该类才生效)、@ConditionalOnMissingBean(容器没有该Bean才生效，让用户可覆盖)、@ConditionalOnProperty(配置满足才生效)、@ConditionalOnWebApplication(是web应用才生效)</p><div class='tip'>自定义starter三步：写配置类@Configuration+@ConditionalOnXxx，在spring.factories注册，用户引入依赖就自动生效。我在项目里配置邮件服务时用@ConditionalOnProperty，SMTP配置存在时才启用</div>"},
+{q:"介绍一下你做的项目，最有亮点的地方是什么？",a:"<p>我做了一个基于Spring Boot+Vue的心理健康AI助手，集成大模型对话、情绪日记、知识库和危机预警模块。最有亮点的是危机预警模块。</p><p><b>双轨检测</b>：实时检测(日记提交时触发，保证响应速度)+定时扫描(凌晨批量执行，做兜底覆盖)</p><p><b>规则引擎设计成无状态纯函数</b>(AlertRuleEngine)，关键词匹配评分，便于测试和扩展，新增规则只加一个函数</p><p><b>事务边界管理</b>：AI调用从事务中隔离出来(注入self代理调用)，避免长事务占用连接池</p><p><b>幂等设计</b>：唯一索引+先查后插。<b>降级容错</b>：邮件不可用时不影响核心预警。<b>AI客户端隔离</b>：为心理咨询和危机分析配置独立ChatClient，避免Prompt污染</p><p>面试时按'问题→方案→收益'的思路讲</p>"}
+]},
+{day:"Day15",title:"模拟面试+查漏补缺",tag:"design",questions:[
+{q:"面试临场冲刺清单有哪些？",a:"<p><b>必背数字：</b>HashMap(16/0.75/8/6/64)、ArrayList(10/1.5)、线程池7参数、隔离级别4个、Redis集群16384槽、Spring事务传播7种</p><p><b>必背对比：</b>HashMap vs Hashtable、synchronized vs Lock、MyISAM vs InnoDB、聚簇vs非聚簇、RDB vs AOF、雪崩vs击穿vs穿透、JDK代理vs CGLIB</p><p><b>必背流程：</b>线程池执行(核心→队列→最大→拒绝)、SQL执行(连接→分析→优化→执行→引擎)、Bean生命周期(实例化→属性→初始化→销毁)、GC(标记→清除/复制/整理)、缓存更新(更新库→删缓存→延迟双删)</p>"},
+{q:"面试实战技巧？",a:"<p><b>答题三段式：</b>点题(核心区别在于...)→展开(原理+关键词)→收尾(使用建议/项目结合)</p><p><b>节奏控制：</b>先答核心区别，再解释原因，最后使用建议。不一来就讲源码</p><p><b>主动收尾：</b>答完问'需要展开讲吗？'，把节奏控制在自己手里</p><p><b>结合项目：</b>别说'我用过'，要说'我在XX项目里因为XX场景用了XX'</p>"},
+{q:"你这个危机预警模块怎么设计的？",a:"<p><b>三层架构：</b></p><p>检测层：双轨检测——实时检测(日记提交时触发，保证响应速度)+定时扫描(凌晨批量执行，做兜底覆盖)</p><p>规则层：AlertRuleEngine纯函数，关键词匹配评分，便于测试和扩展</p><p>通知层：按风险分级通知通道(高危立即推送+邮件，中危站内信，低危记录)</p><p>幂等设计：唯一索引+先查后插。降级容错：邮件不可用时不影响核心预警</p>"},
+{q:"双轨检测为什么这样设计？",a:"<p>实时检测能捕捉即时风险(如日记里提到自伤关键词)，但无法捕捉趋势性风险(如连续一周情绪低分)。</p><p>定时扫描能发现趋势，但有延迟。</p><p>两者结合：实时保速度，定时保覆盖。实时负责'此刻是否危险'，定时负责'这段时间是否在恶化'</p>"},
+{q:"规则引擎为什么设计成纯函数？",a:"<p>纯函数 = 无状态、相同输入永远相同输出、不产生副作用。</p><p>三个优势：1.可测试(不用Mock任何外部依赖) 2.可扩展(开闭原则，新增规则只加函数不改原有) 3.并发安全(无共享状态，批量扫描时不会互相污染)</p>"},
+{q:"事务边界怎么处理的？AI调用和数据库操作怎么协调？",a:"<p><b>问题：</b>AI调用耗时长(秒级)，如果放在事务里会导致长事务占用DB连接池。</p><p><b>解决方案：</b>拆分事务边界——日记存储用短事务(快速提交)，AI分析在事务外执行(注入self代理调用)，告警记录在AI返回后单独写入。</p><p><b>三步协调：</b>1.日记先入库(短事务提交) 2.AI分析在事务外执行 3.告警记录写入(AI返回后单独事务)</p><p><b>降级：</b>AI不可用时用关键词匹配兜底。连接持有时间从秒级降到毫秒级</p>"}
+]}
+];
+</script>
+<script>
+let currentView='list';
+let currentDay='all';
+let searchTerm='';
+let starred=new Set(JSON.parse(localStorage.getItem('starred')||'[]'));
+let flashIndex=0;
+let flashFlipped=false;
+
+const TAGS={java:'java',mysql:'mysql',redis:'redis',spring:'spring',jvm:'jvm',design:'design'};
+const TAG_LABELS={java:'Java',mysql:'MySQL',redis:'Redis',spring:'Spring',jvm:'JVM',design:'综合'};
+
+function renderTabs(){
+  const tabs=document.getElementById('tabs');
+  let html='<div class="tab active" data-day="all">全部</div>';
+  DATA.forEach(d=>{
+    html+=`<div class="tab" data-day="${d.day}">${d.day.replace('Day','D')}</div>`;
+  });
+  tabs.innerHTML=html;
+  tabs.querySelectorAll('.tab').forEach(t=>{
+    t.addEventListener('click',()=>{
+      tabs.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      currentDay=t.dataset.day;
+      renderContent();
+    });
+  });
+}
+
+function renderContent(){
+  const content=document.getElementById('content');
+  let html='';
+  let totalCount=0;
+  
+  DATA.forEach(dayData=>{
+    if(currentDay!=='all'&&currentDay!==dayData.day) return;
+    
+    let questions=dayData.questions.filter(q=>{
+      if(!searchTerm) return true;
+      return q.q.toLowerCase().includes(searchTerm.toLowerCase())||q.a.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+    
+    if(questions.length===0) return;
+    totalCount+=questions.length;
+    
+    html+=`<div class="day-title">${dayData.day} · ${dayData.title} <span class="count">${questions.length}题</span></div>`;
+    
+    if(currentView==='star'){
+      questions=questions.filter(q=>starred.has(dayData.day+'_'+q.q));
+      if(questions.length===0) return;
+    }
+    
+    questions.forEach((q,idx)=>{
+      const id=dayData.day+'_'+q.q;
+      const isStar=starred.has(id);
+      const isOpen=localStorage.getItem('open_'+id)==='1';
+      html+=`<div class="q-card ${isOpen?'open':''}" data-id="${id}">
+        <div class="q-head" onclick="toggleCard(this)">
+          <div class="q-num">${idx+1}</div>
+          <div class="q-text">${q.q}</div>
+          <div class="q-arrow">▼</div>
+        </div>
+        <div class="answer">
+          <span class="tag tag-${dayData.tag}">${TAG_LABELS[dayData.tag]}</span>
+          <span style="font-size:18px;cursor:pointer;float:right" onclick="toggleStar('${id}')">${isStar?'⭐':'☆'}</span>
+          <div style="margin-top:6px">${q.a}</div>
+        </div>
+      </div>`;
+    });
+  });
+  
+  if(totalCount===0){
+    html='<div class="empty">没有找到相关题目</div>';
+  }
+  
+  content.innerHTML=html;
+  updateProgress();
+}
+
+function toggleCard(el){
+  const card=el.parentElement;
+  card.classList.toggle('open');
+  const id=card.dataset.id;
+  if(card.classList.contains('open')){
+    localStorage.setItem('open_'+id,'1');
+  }else{
+    localStorage.removeItem('open_'+id);
+  }
+  updateProgress();
+}
+
+function toggleStar(id){
+  if(starred.has(id)){
+    starred.delete(id);
+  }else{
+    starred.add(id);
+  }
+  localStorage.setItem('starred',JSON.stringify([...starred]));
+  renderContent();
+}
+
+function updateProgress(){
+  const all=DATA.reduce((s,d)=>s+d.questions.length,0);
+  const opened=Object.keys(localStorage).filter(k=>k.startsWith('open_')).length;
+  const pct=Math.round(opened/all*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+}
+
+function startFlash(){
+  flashIndex=0;
+  flashFlipped=false;
+  document.getElementById('flashMode').classList.add('show');
+  renderFlash();
+}
+
+function renderFlash(){
+  const all=[];
+  DATA.forEach(d=>{
+    d.questions.forEach(q=>{
+      if(currentDay==='all'||currentDay===d.day){
+        all.push({...q,tag:d.tag,day:d.day});
+      }
+    });
+  });
+  
+  if(flashIndex>=all.length) flashIndex=0;
+  const item=all[flashIndex];
+  if(!item) return;
+  
+  flashFlipped=false;
+  const card=document.getElementById('flashCard');
+  const flipBtn=document.getElementById('flipBtn');
+  
+  card.innerHTML=`
+    <div class="fc-tag"><span class="tag tag-${item.tag}">${TAG_LABELS[item.tag]}</span> ${item.day} · 第${flashIndex+1}/${all.length}题</div>
+    <div class="fc-q">${item.q}</div>
+    <div class="hint" id="flashHint">点击「翻转」查看答案</div>
+  `;
+  flipBtn.textContent='翻转';
+}
+
+function flipCard(){
+  const all=[];
+  DATA.forEach(d=>{
+    d.questions.forEach(q=>{
+      if(currentDay==='all'||currentDay===d.day){
+        all.push({...q,tag:d.tag,day:d.day});
+      }
+    });
+  });
+  
+  const item=all[flashIndex];
+  if(!item) return;
+  
+  flashFlipped=!flashFlipped;
+  const card=document.getElementById('flashCard');
+  const flipBtn=document.getElementById('flipBtn');
+  
+  if(flashFlipped){
+    card.innerHTML=`
+      <div class="fc-tag"><span class="tag tag-${item.tag}">${TAG_LABELS[item.tag]}</span> ${item.day} · 答案</div>
+      <div class="fc-a">${item.a}</div>
+      <div class="hint">点击「下一题」继续</div>
+    `;
+    flipBtn.textContent='收起';
+  }else{
+    card.innerHTML=`
+      <div class="fc-tag"><span class="tag tag-${item.tag}">${TAG_LABELS[item.tag]}</span> ${item.day} · 第${flashIndex+1}/${all.length}题</div>
+      <div class="fc-q">${item.q}</div>
+      <div class="hint">点击「翻转」查看答案</div>
+    `;
+    flipBtn.textContent='翻转';
+  }
+}
+
+function nextCard(){
+  flashIndex++;
+  renderFlash();
+}
+
+function prevCard(){
+  flashIndex--;
+  if(flashIndex<0) flashIndex=0;
+  renderFlash();
+}
+
+function closeFlash(){
+  document.getElementById('flashMode').classList.remove('show');
+}
+
+document.getElementById('searchInput').addEventListener('input',e=>{
+  searchTerm=e.target.value;
+  renderContent();
+});
+
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentView=btn.dataset.view;
+    if(currentView==='flash'){
+      startFlash();
+    }else{
+      document.getElementById('flashMode').classList.remove('show');
+      renderContent();
+    }
+  });
+});
+
+renderTabs();
+renderContent();
+</script>
+</body>
+</html>
